@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/lzawadka/api_exodus_university/issues"
   },
-  "homepage": "https://github.com/lzawadka/api_exodus_university#readme"
+  "homepage": "https://github.com/lzawadka/api_exodus_university#readme",
+  "dependencies": {
+    "package_aeu": "^1.0.4"
+  }
 }
