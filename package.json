@@ -4,7 +4,8 @@
   "description": "api_exodus_university",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ./bin/www -e *"
+    "start": "nodemon ./bin/www -e *",
+    "create": "node controller/controller.sensor.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,6 @@
   "dependencies": {
     "@influxdata/influxdb-client": "^1.15.0",
     "nodemon": "^2.0.12",
-    "package_aeu": "^1.0.4"
+    "package_aeu": "^1.0.5"
   }
 }
