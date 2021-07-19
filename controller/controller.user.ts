@@ -1,4 +1,4 @@
-const User = require('../models/model.user.ts');
+const User = require('../models/model.user');
 
 exports.addOne = (req, res) => {
   const user = new User({

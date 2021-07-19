@@ -1,6 +1,6 @@
 const math = require('../services/id_generator')
 const { Point, InfluxDB } = require('@influxdata/influxdb-client')
-const User = require('../models/model.user.ts');
+const User = require('../models/model.user');
 const org = 'zawadka78@gmail.com'
 // You can generate a Token from the "Tokens Tab" in the UI
 const token = 'we-qe81LgT-vs_PauBeeJL7zDfPbAYOX0OpRZYBhLkr0BsGW9pb-o2ABW1rX1UVAOtRKgy7S7F480uB5mLmzVg=='

@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
-const User = require('./models/model.user.ts');
+require('dotenv').config();
+const port = process.env.PORT || 6000;
 const mongoose = require('mongoose');
 const uri = "mongodb+srv://root:root@cluster0.z61hf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
@@ -10,12 +11,12 @@ const sensorRouter = require('./routes/route.sensor.ts')
 
 const app = express();
 
-app.use('/user', userRouter);
-app.use('/sensor', sensorRouter)
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/user', userRouter);
+app.use('/sensor', sensorRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -31,6 +32,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.send()
+});
+
+app.listen(port, () => {
+  console.log(`Server running at here ${port}`);
 });
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
