@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
-require('dotenv').config();
 const port = process.env.PORT || 6000;
 const mongoose = require('mongoose');
 var cookieParser = require('cookie-parser');
 const uri = "mongodb+srv://root:root@cluster0.z61hf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
+if (process.env.NODE_ENV !== 'production')
+  require('dotenv').config();
 // Route
 const userRouter = require('./routes/route.user.js')
 const sensorRouter = require('./routes/route.sensor.js')
