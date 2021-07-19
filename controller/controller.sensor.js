@@ -51,7 +51,7 @@ const getPosition = `from(bucket: "MarsUniversity")
   |> range(start: -6h)
   |> filter(fn: (r) => r["_measurement"] == "Position")
   |> filter(fn: (r) => r["id_sensor"] == "pos_6151112970")`
-queryApi.queryRows(getPosition, {
+exports.getPos = () => queryApi.queryRows(getPosition, {
   next(row, tableMeta) {
     const o = tableMeta.toObject(row)
     console.log(
@@ -71,7 +71,7 @@ const query = `from(bucket: "MarsUniversity")
   |> range(start: -6h)
   |> filter(fn: (r) => r["_measurement"] == "Température")
   |> filter(fn: (r) => r["id_sensor"] == "temp_4436276148")`
-queryApi.queryRows(query, {
+exports.getTemp = () => queryApi.queryRows(query, {
   next(row, tableMeta) {
     const o = tableMeta.toObject(row)
     console.log(
