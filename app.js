@@ -1,7 +1,17 @@
-var express = require('express');
-var path = require('path');
+const express = require('express');
+const path = require('path');
+const User = require('./models/model.user.ts');
+const mongoose = require('mongoose');
+const uri = "mongodb+srv://root:root@cluster0.z61hf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
-var app = express();
+// Route
+const userRouter = require('./routes/route.user.ts')
+const sensorRouter = require('./routes/route.sensor.ts')
+
+const app = express();
+
+app.use('/user', userRouter);
+app.use('/sensor', sensorRouter)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -20,7 +30,9 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.send()
 });
 
-module.exports = app;
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(app.listen(3000))
+  .catch();

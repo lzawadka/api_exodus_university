@@ -4,7 +4,7 @@
   "description": "api_exodus_university",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ./bin/www -e *",
+    "start": "nodemon app.js",
     "create": "node controller/controller.sensor.js"
   },
   "repository": {
@@ -19,7 +19,8 @@
   "homepage": "https://github.com/lzawadka/api_exodus_university#readme",
   "dependencies": {
     "@influxdata/influxdb-client": "^1.15.0",
+    "mongodb": "^4.0.0",
     "nodemon": "^2.0.12",
-    "package_aeu": "^1.0.5"
+    "package_aeu": "^1.0.6"
   }
 }
