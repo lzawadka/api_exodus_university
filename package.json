@@ -4,7 +4,8 @@
   "description": "api_exodus_university",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js",
+    "create": "node controller/controller.sensor.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,10 @@
   },
   "homepage": "https://github.com/lzawadka/api_exodus_university#readme",
   "dependencies": {
-    "package_aeu": "^1.0.4"
+    "@influxdata/influxdb-client": "^1.15.0",
+    "mongodb": "^4.0.0",
+    "mongoose": "^5.13.3",
+    "nodemon": "^2.0.12",
+    "package_aeu": "^1.0.6"
   }
 }
