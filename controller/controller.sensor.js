@@ -1,4 +1,3 @@
-const math = require('../services/id_generator')
 const { Point, InfluxDB } = require('@influxdata/influxdb-client')
 const User = require('../models/model.user');
 const org = 'zawadka78@gmail.com'
