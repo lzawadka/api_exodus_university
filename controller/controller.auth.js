@@ -5,7 +5,7 @@ exports.RegisterUser = async (req, res) => {
   const user = new User(req.body);
   const userFind = await User.findOne({ 'email': req.body.email });
   if (userFind != null) {
-    return res.status(409).json({
+    return res.status(418).json({
       success: false,
       message: 'User already exist',
       email: req.body.email
@@ -13,7 +13,7 @@ exports.RegisterUser = async (req, res) => {
   } 
   await user.save((err, doc) => {
     if (err) {
-      return res.status(422).json({errors:err})
+      return res.status(418).json({errors:err})
     } else {
       const userData = {
         firtsName: doc.firstName,
@@ -28,6 +28,7 @@ exports.RegisterUser = async (req, res) => {
     }
   });
 }
+
 exports.LoginUser = (req, res) => {
   User.findOne({ 'email': req.body.email }, (err, user) => {
     if (!user) {
