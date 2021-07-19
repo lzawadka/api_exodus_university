@@ -8,8 +8,4 @@ router.post('/login', authController.LoginUser);
 router.get('/getDetails', auth, authController.getUserDetails);
 router.get('/logout', auth, authController.LogoutUser);
 
-// router.get('/getUser', userController.getOne);
-
-// router.post('/createUser', userController.addOne);
-
 module.exports = router
