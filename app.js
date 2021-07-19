@@ -3,17 +3,19 @@ const path = require('path');
 require('dotenv').config();
 const port = process.env.PORT || 6000;
 const mongoose = require('mongoose');
+var cookieParser = require('cookie-parser');
 const uri = "mongodb+srv://root:root@cluster0.z61hf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
 // Route
-const userRouter = require('./routes/route.user.ts')
-const sensorRouter = require('./routes/route.sensor.ts')
+const userRouter = require('./routes/route.user.js')
+const sensorRouter = require('./routes/route.sensor.js')
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
 app.use('/user', userRouter);
 app.use('/sensor', sensorRouter)

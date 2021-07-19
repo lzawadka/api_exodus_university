@@ -1,7 +1,7 @@
 const express = require('express')
-const Sensor = require('../models/model.sensor.ts')
+const Sensor = require('../models/model.sensor')
 const router = express.Router();
-const sensorController = require('../controller/controller.sensor.ts');
+const sensorController = require('../controller/controller.sensor');
 
 //router.get('/getSensor', sensorController.getSensors);
 

@@ -1,5 +1,4 @@
 //in AuthController.js
-
 const { User } = require('../models/model.user');
 
 exports.RegisterUser = async (req, res) => {
@@ -86,6 +85,8 @@ exports.getUserDetails= (req, res) => {
     firstName: req.user.firstName,
     lastName: req.user.lastName,
     email: req.user.email,
+    role: req.user.role,
+    id_sensor: req.user.id_sensor,
   });
 };
 

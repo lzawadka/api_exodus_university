@@ -48,10 +48,12 @@ userSchema.methods.generateToken = function (callBack) {
       callBack(null, user)
 });
 };
+
 //validating token for auth routes middleware
 userSchema.statics.findByToken = function (token, callBack) {
   const user = this;
-  jwt.verify(token, process.env.JWT_KEY, function (err, decode) {//this decode must give user_id if token is valid .ie decode=user_id
+  jwt.verify(token, process.env.JWT_KEY, function (err, decode) {
+    //this decode must give user_id if token is valid .ie decode=user_id
     user.findOne({ '_id': decode, 'token': token }, function (err, user) {
       if (err) return callBack(err);
         callBack(null, user);
