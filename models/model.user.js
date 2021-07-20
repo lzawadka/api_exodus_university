@@ -7,9 +7,10 @@ const SALT = 10;
 
 const userSchema = mongoose.Schema({
   lastName: { type: String, required: true, trim: true, maxlength: 100 },
-  firstName: { type: String, required: true, trim: true, maxlength: 100},
+  firstName: { type: String, required: true, trim: true, maxlength: 100 },
   email: { type: String, required: true, trim: true, unique: 1 },
   password: { type: String, required: true, minlength: 5 },
+  profile_picture: { type: String, required: true },
   role: { type: String, required: true },
   id_sensor: { type: String, required: true, trim: true, unique: 1 },
   token: { type: String }
