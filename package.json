@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "prod": "export $(cat .env | xargs) && npm start"
+    "people": "node services/moovementGenerator.js",
+    "create": "node controller/controller.sensor.js"
   },
   "repository": {
     "type": "git",
