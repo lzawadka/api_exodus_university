@@ -8,5 +8,6 @@ exports.addOneRoom = (req, res) => {
     if (err) {
       console.log(err);
     }
+    return article;
   });
 };

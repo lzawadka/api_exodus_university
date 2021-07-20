@@ -36,5 +36,8 @@ app.use(function (err, req, res, next) {
 
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(app.listen(3000))
+  .then(() => {
+    console.log("MongoDB connected ");
+    app.listen(3000);
+  })
   .catch();
