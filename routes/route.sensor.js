@@ -1,10 +1,10 @@
 const express = require('express')
-const Sensor = require('../models/model.sensor')
 const router = express.Router();
+const { auth } = require('../middleware/auth')
 const sensorController = require('../controller/controller.sensor');
 
-//router.get('/getSensor', sensorController.getSensors);
-
-router.post('/createSensor', sensorController.createDataInflux);
+router.get('/getUserWatchData', auth, sensorController.GetUserWatchData);
+router.get('/getAllRoomData', auth, sensorController.GetAllRoomData);
+router.get('/getRoomData', auth, sensorController.GetRoomData);
 
 module.exports = router;
