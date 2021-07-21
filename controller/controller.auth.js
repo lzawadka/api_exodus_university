@@ -144,6 +144,21 @@ exports.UpdateUser = (req, res) => {
 };
 //get all users
 exports.GetAllUsers = (req, res) => {
-  return User.find({});
+  let usersArray = [];
+  User.find((err, users) => {
+    users.forEach((user) => {
+      const data = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        profile_picture: user.profile_picture,
+        id_sensor: user.id_sensor
+      }
+      usersArray.push(data)
+    })
+    
+    res.status(200).json({success: true, users: usersArray});  
+  }).limit(20);
 };
 
