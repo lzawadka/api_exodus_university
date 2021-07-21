@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 5000;
+const cors = require("cors");
 const mongoose = require('mongoose');
 var cookieParser = require('cookie-parser');
 const uri = "mongodb+srv://root:root@cluster0.z61hf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -11,6 +12,7 @@ const sensorRouter = require('./routes/route.sensor.js')
 
 const app = express();
 
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
