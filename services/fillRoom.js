@@ -1,3 +1,7 @@
+/**
+ * Script pour remlir une salle jusqu'a ce qu'elle se bloque
+ */
+
 const { GetAllUsers } = require("../controller/controller.auth.js");
 const {
   getAllRooms,
@@ -7,15 +11,8 @@ const _ = require("lodash");
 
 const { mongo, mongoClose } = require("./mongo");
 
-/**
- * Service permettant de simuler les mouvements des personnes qui entrent et sortent des pièces
- */
-
-let relance = 0;
-
 // Script de remplissage et vidage des gens
-const moovementGenerator = async () => {
-  relance++;
+const fillRoom = (async () => {
   // Connection a la bdd
   try {
     await mongo().then(async (mongoose) => {
@@ -28,9 +25,9 @@ const moovementGenerator = async () => {
 
       // all rooms
       const rooms = await getAllRooms();
+      const randomRoom = _.sample(rooms);
 
       const promise = users.map(async (user) => {
-        const randomRoom = _.sample(rooms);
         const req = {
           body: {
             id: randomRoom._id,
@@ -39,22 +36,12 @@ const moovementGenerator = async () => {
         };
 
         await new Promise((resolve) =>
-          setTimeout(resolve, Math.floor(Math.random() * 10000) + 100)
+          setTimeout(resolve, Math.floor(Math.random() * 20000) + 100)
         );
 
         // faire rentrer un user dans une salles aléatoire
-        console.log(`${user._id} Entre dans la salle ${randomRoom.label}`);
         const roomFill = await updateRoomActualUsers(req);
-
-        // attendre entre 30s et 1min
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.floor(Math.random() * 30000) + 30000)
-        );
-
-        // faire sortir le user de sa salle
-        const roomVoid = await updateRoomActualUsers(req);
-        console.log(`${user._id} sort de la salle ${randomRoom.label}`);
-        // console.log("roomVoid", roomVoid);
+        console.log(`${user._id} Entre dans la salle ${randomRoom.label}`);
 
         return roomFill;
       });
@@ -67,13 +54,7 @@ const moovementGenerator = async () => {
   } finally {
     // close connexion
     await mongoClose();
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    if (relance < 4) {
-      moovementGenerator();
-    }
   }
-};
+})();
 
-moovementGenerator();
-
-// module.exports.moovementGenerator = moovementGenerator;
+module.exports.fillRoom = fillRoom;

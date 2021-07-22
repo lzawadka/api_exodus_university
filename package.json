@@ -6,6 +6,8 @@
   "scripts": {
     "start": "nodemon app.js",
     "people": "node services/moovementGenerator.js",
+    "fillRoom": "node services/fillRoom.js",
+    "voidAllRooms": "node services/voidAllRooms.js",
     "create": "node controller/controller.sensor.js",
     "createRoom": "node services/createRooms.js"
   },

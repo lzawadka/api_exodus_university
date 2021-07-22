@@ -43,7 +43,7 @@ exports.updateRoomLocked = async (req, res) => {
   const filter = { _id: req.body.id };
   const room = await Room.findOne(filter);
 
-  const update = { capacity: !room.locked };
+  const update = { locked: !room.locked };
 
   let roomUpdate = await Room.findOneAndUpdate(filter, update);
 
@@ -63,35 +63,49 @@ exports.updateRoomCapacity = async (req, res) => {
   return res.status(200).json({ success: true, room });
 };
 
+exports.voidAllRooms = async (req, res) => {
+  const rooms = await exports.getAllRooms();
+
+  const promise = rooms.map(async (room) => {
+    const update = { actual_users: [], locked: false };
+    roomUpdate = await Room.findOneAndUpdate({ _id: room._id }, update);
+  });
+
+  return Promise.all(promise);
+};
+
 exports.updateRoomActualUsers = async (req, res) => {
   const filter = { _id: req.body.id };
+  const _id = req.body.id;
   const idUser = req.body.idUser;
 
-  const room = await Room.findOne(filter);
+  let room = await Room.findById(_id);
 
   let roomUpdate = {};
   if (room.actual_users.includes(idUser)) {
-    console.log("sortir");
     const filterUsers = room.actual_users.filter((id) => id !== idUser);
-    console.log("filterUsers", filterUsers);
     const update = { actual_users: filterUsers };
     roomUpdate = await Room.findOneAndUpdate(filter, update);
   } else {
     if (room.locked) {
-      return `La salle ${room._id} est vérouillée, l'user ${idUser} ne peut donc pas y entrer.`;
+      const msgLocked = `La salle ${room._id} est vérouillée, l'user ${idUser} ne peut donc pas y entrer.`;
+      console.log(msgLocked);
+      return msgLocked;
     }
     roomUpdate = await Room.findOneAndUpdate(filter, {
       actual_users: [...room.actual_users, idUser],
     });
   }
 
+  room = await Room.findById(_id);
+
   // vérouiller ou pas le porte si la salle est pleine
   if (room.actual_users.length >= room.capacity) {
-    Room.findOneAndUpdate(filter, {
+    await Room.findOneAndUpdate(filter, {
       locked: true,
     });
   } else {
-    Room.findOneAndUpdate(filter, {
+    await Room.findOneAndUpdate(filter, {
       locked: false,
     });
   }
