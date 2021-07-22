@@ -41,10 +41,6 @@ exports.getRoomDetails = async (req, res) => {
 
 exports.getRoomUsers = async (req, res) => {
   const room = await Room.findOne({ _id: req.body.room_id });
-  console.log("room", room)
-  if (res) {
-    return room.actual_users;
-  }
   return room;
 };
 
