@@ -53,9 +53,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
   let queryUsers = "";
   let arrayResp = [];
   if (getRoomUsers.actual_users.length != 0) {
-    console.log(getRoomUsers, 'getRoomUsers')
     usersWatch = await getWatchIds(getRoomUsers.actual_users);
-    console.log(usersWatch, 'usersWatchId')
   } else {
     return res.status(400).send({ success: false, message: "No user in room, room_id: " +  req.body.room_id});
   }
@@ -71,7 +69,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
   })
 
   const queryGetAllUsersRoomWatchData = `from(bucket: "MarsUniversity")
-    |> range(start: -30m)
+    |> range(start: -3h)
     |> filter(fn: (r) => ${queryUsers})
     |> filter(fn: (r) => r["_field"] == "data_value")
     |> filter(fn: (r) => r["_measurement"] == "Oxymetre")
@@ -89,18 +87,27 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
       console.log('Finished SUCCESS')
       let usersWatchData = []
       usersWatch.forEach((user) => {
-        var result = arrayResp.find(obj => {
+        let result = arrayResp.filter(obj => {
           return obj.nodeID == user.id_sensor
         })
+
+        let oxymetre_values = [];
+        result.forEach((data) => {
+          console.log(result, "result")
+          const oxymetre_value = {
+            time: data._time,
+            value: data._value,
+            measurement: data._measurement
+          }
+          oxymetre_values.push(oxymetre_value)
+        })
+        
         const userData = {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           profile_picture: user.profile_picture,
-          time: result._time,
-          value: result._value,
-          measurement: result._measurement,
-          nodeID: result.nodeID
+          oxymetre_values
         }
         usersWatchData.push(userData)
       })
