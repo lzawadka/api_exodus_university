@@ -145,7 +145,7 @@ exports.UpdateUser = (req, res) => {
 //get all users
 exports.GetAllUsers = (req, res) => {
   let usersArray = [];
-  User.find((err, users) => {
+  User.find({}, (err, users) => {
     users.forEach((user) => {
       const data = {
         firstName: user.firstName,

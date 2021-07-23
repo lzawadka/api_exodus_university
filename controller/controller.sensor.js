@@ -52,7 +52,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
   let getRoomUsers = await room.getRoomUsers(req, res);
   let queryUsers = "";
   let arrayResp = [];
-  if (getRoomUsers.length != 0) {
+  if (getRoomUsers.actual_users.length != 0) {
     console.log(getRoomUsers, 'getRoomUsers')
     usersWatch = await getWatchIds(getRoomUsers.actual_users);
     console.log(usersWatch, 'usersWatchId')
