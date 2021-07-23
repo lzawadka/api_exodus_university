@@ -21,6 +21,8 @@ exports.getAllRooms = async (req, res) => {
       _id: room._id,
       label: room.label,
       node_id: room.node_id,
+      capacity: room.capacity,
+      locked: room.locked,
     };
     roomMap.push(obj);
   });
@@ -71,7 +73,9 @@ exports.voidAllRooms = async (req, res) => {
     roomUpdate = await Room.findOneAndUpdate({ _id: room._id }, update);
   });
 
-  return Promise.all(promise);
+  await Promise.all(promise);
+  console.log("Salles vidées");
+  return;
 };
 
 exports.updateRoomActualUsers = async (req, res) => {
@@ -88,9 +92,12 @@ exports.updateRoomActualUsers = async (req, res) => {
     roomUpdate = await Room.findOneAndUpdate(filter, update);
   } else {
     if (room.locked) {
-      const msgLocked = `La salle ${room._id} est vérouillée, l'user ${idUser} ne peut donc pas y entrer.`;
+      const msgLocked = ` ⛔️ La salle ${room._id} est vérouillée, l'user ${idUser} ne peut donc pas y entrer. ⛔️ `;
       console.log(msgLocked);
-      return msgLocked;
+      return {
+        enter: false,
+        msgLocked,
+      };
     }
     roomUpdate = await Room.findOneAndUpdate(filter, {
       actual_users: [...room.actual_users, idUser],
@@ -114,5 +121,8 @@ exports.updateRoomActualUsers = async (req, res) => {
   if (res) {
     return res.status(200).json({ success: true, room });
   }
-  return roomUpdate;
+  return {
+    enter: true,
+    roomUpdate,
+  };
 };
