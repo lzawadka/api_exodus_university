@@ -1,95 +1,174 @@
 const { Point, InfluxDB } = require('@influxdata/influxdb-client')
-const User = require('../models/model.user');
+const { User } = require('../models/model.user.js');
 const org = 'zawadka78@gmail.com'
+const room = require('../controller/controller.room')
 // You can generate a Token from the "Tokens Tab" in the UI
-const token =
-  "we-qe81LgT-vs_PauBeeJL7zDfPbAYOX0OpRZYBhLkr0BsGW9pb-o2ABW1rX1UVAOtRKgy7S7F480uB5mLmzVg==";
-const bucket = "MarsUniversity";
-const client = new InfluxDB({
-  url: "https://eu-central-1-1.aws.cloud2.influxdata.com",
-  token: token,
-});
+const token = 'we-qe81LgT-vs_PauBeeJL7zDfPbAYOX0OpRZYBhLkr0BsGW9pb-o2ABW1rX1UVAOtRKgy7S7F480uB5mLmzVg=='
+const client = new InfluxDB({ url: 'https://eu-central-1-1.aws.cloud2.influxdata.com', token: token })
 // Execute flux query
 const queryApi = client.getQueryApi(org);
+const ObjectId = require('mongodb').ObjectId
 
-exports.createDataInflux = async () => {
-  console.log("Hello guys ");
-  const writeApi = client.getWriteApi(org, bucket);
-  writeApi.useDefaultTags({ host: "host1", location: "browser" });
+exports.GetUserWatchData = (req, res) => {
+  let token = req.cookies['authToken'];
+  let arrayResp = [];
+  User.findByToken(token, (err, user) => {
+    if (err) throw err;
+    const queryGetUserWatchData = `from(bucket: "MarsUniversity")
+      |> range(start: -1h)
+      |> filter(fn: (r) => r["nodeID"] == "${user.id_sensor}") 
+      |> sort(columns: ["_time"], desc: true)` // TODO remove watchId by true id
+    queryApi.queryRows(queryGetUserWatchData, {
+      next(row, tableMeta) {
+        const o = tableMeta.toObject(row)
+        arrayResp.push(o);
+      },
+      error(error) {
+        console.error(error)
+        console.log('Finished ERROR')
+      },
+      complete() {
+        console.log('Finished SUCCESS')
+        const userData = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          profile_picture: user.profile_picture,
+          time: arrayResp[0]._time,
+          value: arrayResp[0]._value,
+          measurement: arrayResp[0]._measurement,
+          nodeID: arrayResp[0].nodeID
+        }
+        let userWatchResult = [];
+        userWatchResult.push(userData)
+        console.log(userData, 'userData');
+        return res.status(200).send({ success: true, userWatchResult: userWatchResult});
+      }
+    })
+  })
+}
 
-  function createPointInflux(pointName, prefixId, data) {
-    const pointInflux = new Point(pointName)
-      .tag("id_sensor", prefixId)
-      .floatField("data", data);
-
-    return pointInflux;
+exports.GetAllUserRoomWatchData = async (req, res) => {
+  let getRoomUsers = await room.getRoomUsers(req, res);
+  let queryUsers = "";
+  let arrayResp = [];
+  if (getRoomUsers.actual_users.length != 0) {
+    usersWatch = await getWatchIds(getRoomUsers.actual_users);
+  } else {
+    return res.status(400).send({ success: false, message: "No user in room, room_id: " +  req.body.room_id});
   }
-  let sensorID = "";
-  await User.findById("60f1a86dfba97cb7cbcb65cb")
-    .then((user) => {
-      console.log(user, "user");
-      sensorID = user.id_sensor;
-    })
-    .catch((err) => console.log(err));
-  console.log(sensorID, "userTest");
-  const temp = createPointInflux("Température", "temp_" + sensorID, math());
-  const oxygene = createPointInflux("Oxygène", "oxygene" + sensorID, math());
-  const pos = createPointInflux("Position", "pos_" + sensorID, math());
-  const occupancy_rate = createPointInflux(
-    "Occupancy_Rate",
-    "occupancy_rate_" + math(),
-    math()
-  );
-  const bpm = createPointInflux("BPM", "bpm_" + sensorID, math());
+  let indexUser = 0;
 
-  writeApi.writePoints([temp, oxygene, pos, occupancy_rate, bpm]);
-  writeApi
-    .close()
-    .then(() => {
-      console.log("FINISHED");
-    })
-    .catch((e) => {
-      console.error(e);
-      console.log("Finished ERROR");
-    });
-};
+  // Create part of the query
+  usersWatch.forEach((users) => {
+    indexUser++;
+    if(usersWatch.length == indexUser)
+      queryUsers += (`r["nodeID"] == "${users.id_sensor}"`)
+    else
+      queryUsers += (`r["nodeID"] == "${users.id_sensor}" or `)
+  })
 
-const getPosition = `from(bucket: "MarsUniversity")
-  |> range(start: -6h)
-  |> filter(fn: (r) => r["_measurement"] == "Position")
-  |> filter(fn: (r) => r["id_sensor"] == "pos_6151112970")`;
-exports.getPos = () =>
-  queryApi.queryRows(getPosition, {
+  const queryGetAllUsersRoomWatchData = `from(bucket: "MarsUniversity")
+    |> range(start: -3h)
+    |> filter(fn: (r) => ${queryUsers})
+    |> filter(fn: (r) => r["_field"] == "data_value")
+    |> filter(fn: (r) => r["_measurement"] == "Oxymetre")
+    |> sort(columns: ["_time"], desc: true)` 
+  queryApi.queryRows(queryGetAllUsersRoomWatchData, {
     next(row, tableMeta) {
-      const o = tableMeta.toObject(row);
-      console.log(`Sensor ID = ${o.id_sensor}, value = ${o._value}`);
+      const o = tableMeta.toObject(row)
+      arrayResp.push(o);
     },
     error(error) {
-      console.error(error);
-      console.log("Finished ERROR");
+      console.error(error)
+      console.log('Finished ERROR')
     },
     complete() {
-      console.log("Finished SUCCESS");
-    },
-  });
+      console.log('Finished SUCCESS')
+      let usersWatchData = []
+      usersWatch.forEach((user) => {
+        let result = arrayResp.filter(obj => {
+          return obj.nodeID == user.id_sensor
+        })
 
-const query = `from(bucket: "MarsUniversity")
-  |> range(start: -6h)
-  |> filter(fn: (r) => r["_measurement"] == "Température")
-  |> filter(fn: (r) => r["id_sensor"] == "temp_4436276148")`;
-exports.getTemp = () =>
-  queryApi.queryRows(query, {
+        let oxymetre_values = [];
+        result.forEach((data) => {
+          console.log(result, "result")
+          const oxymetre_value = {
+            time: data._time,
+            value: data._value,
+            measurement: data._measurement
+          }
+          oxymetre_values.push(oxymetre_value)
+        })
+        
+        const userData = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          profile_picture: user.profile_picture,
+          oxymetre_values
+        }
+        usersWatchData.push(userData)
+      })
+      return res.status(200).send({ success: true, usersWatchResult: usersWatchData });
+    }
+  })
+}
+
+exports.GetOneRoomData = (req, res) => {
+  let arrayResp = [];
+  const queryGetOneRoomData = `from(bucket: "MarsUniversity")
+    |> range(start: -3h)
+    |> filter(fn: (r) => r["nodeID"] == "${req.body.id_room}")
+    |> filter(fn: (r) => r["_field"] == "data_value")
+    |> filter(fn: (r) => r["_measurement"] == "Luminosity" or r["_measurement"] == "Temperature" or r["_measurement"] == "Oxygen" or r["_measurement"] == "Watts")
+    |> sort(columns: ["_time"], desc: true)`
+  queryApi.queryRows(queryGetOneRoomData, {
     next(row, tableMeta) {
-      const o = tableMeta.toObject(row);
-      console.log(
-        `${o._time} ${o._measurement} in '${o.location}' (${o.example}): ${o._field}=${o._value} where id_sensor = ${o.id_sensor}`
-      );
+      let resp = tableMeta.toObject(row)
+      arrayResp.push(resp);
     },
     error(error) {
-      console.error(error);
-      console.log("Finished ERROR");
+      console.error(error)
+      console.log('Finished ERROR')
     },
     complete() {
-      console.log("Finished SUCCESS");
+      console.log('Finished SUCCESS')
+      return res.status(200).send({ success: true, bpmValue: arrayResp });
+    }
+  })
+}
+
+exports.GetAllRoomData = (req, res) => {
+  let arrayResp = [];
+  const queryGetAllRoomData = `from(bucket: "MarsUniversity")
+    |> range(start: -3h)
+    |> filter(fn: (r) => r["_field"] == "data_value")
+    |> filter(fn: (r) => r["_measurement"] == "Luminosity" or r["_measurement"] == "Temperature" or r["_measurement"] == "Oxygen" or r["_measurement"] == "Watts")
+    |> sort(columns: ["_time"], desc: true)
+    |> yield(name: "mean")`
+  queryApi.queryRows(queryGetAllRoomData, {
+    next(row, tableMeta) {
+      var resp = tableMeta.toObject(row);
+      arrayResp.push(resp)
     },
-  });
+    error(error) {
+      console.error(error)
+      console.log('Finished ERROR')
+    },
+    complete() {
+      console.log('Finished SUCCESS')
+      res.status(200).send({ success: true, object: arrayResp });
+    }
+  })
+}
+
+async function getWatchIds(usersId) {
+  let allUserWatch = [];
+  for (const userId of usersId) {
+    const user = await User.findOne({ _id: new ObjectId(userId) })
+    allUserWatch.push(user);
+  }
+  return allUserWatch;
+}

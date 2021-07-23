@@ -41,6 +41,11 @@ exports.getRoomDetails = async (req, res) => {
   return room;
 };
 
+exports.getRoomUsers = async (req, res) => {
+  const room = await Room.findOne({ _id: req.body.room_id });
+  return room;
+};
+
 exports.updateRoomLocked = async (req, res) => {
   const filter = { _id: req.body.id };
   const room = await Room.findOne(filter);
