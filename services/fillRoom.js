@@ -16,16 +16,21 @@ const fillRoom = (async () => {
   // Connection a la bdd
   try {
     await mongo().then(async (mongoose) => {
-      console.log("Connected to mongo!!");
-
       // all users
       const users = await GetAllUsers();
 
-      console.log("user length", users.length);
+      console.log("\n");
+      console.log("Nombres d'utilisateurs", users.length);
 
       // all rooms
       const rooms = await getAllRooms();
       const randomRoom = _.sample(rooms);
+
+      console.log("\n");
+      console.log(
+        `Les utilisateurs entrent dans la salle ${randomRoom.label} qui a une capacité de ${randomRoom.capacity} places.`
+      );
+      console.log("\n");
 
       const promise = users.map(async (user) => {
         const req = {
@@ -40,8 +45,18 @@ const fillRoom = (async () => {
         );
 
         // faire rentrer un user dans une salles aléatoire
+        console.log("\n");
+        console.log(
+          `${user._id} est sur le point d'entrer dans la salle ${randomRoom.label}`
+        );
+
         const roomFill = await updateRoomActualUsers(req);
-        console.log(`${user._id} Entre dans la salle ${randomRoom.label}`);
+        if (roomFill.enter) {
+          console.log(
+            `${user._id} est entré dans la salle ${randomRoom.label}  🚶‍♂️🚪 `
+          );
+          console.log("\n");
+        }
 
         return roomFill;
       });

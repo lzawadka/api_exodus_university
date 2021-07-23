@@ -1,4 +1,5 @@
 const { GetAllUsers } = require("../controller/controller.auth.js");
+const { voidAllRooms } = require("../controller/controller.room.js");
 const {
   getAllRooms,
   updateRoomActualUsers,
@@ -24,7 +25,9 @@ const moovementGenerator = async () => {
       // all users
       const users = await GetAllUsers();
 
-      console.log("user length", users.length);
+      console.log("\n");
+      console.log("Nombres d'utilisateurs ", users.length);
+      console.log("\n");
 
       // all rooms
       const rooms = await getAllRooms();
@@ -43,8 +46,14 @@ const moovementGenerator = async () => {
         );
 
         // faire rentrer un user dans une salles aléatoire
-        console.log(`${user._id} Entre dans la salle ${randomRoom.label}`);
+        console.log(
+          `${user._id} est sur le point d'entrer dans la salle ${randomRoom.label}`
+        );
         const roomFill = await updateRoomActualUsers(req);
+        console.log(
+          `${user._id} Entre dans la salle ${randomRoom.label} 🚶‍♂️🚪 `
+        );
+        console.log("\n");
 
         // attendre entre 30s et 1min
         await new Promise((resolve) =>
@@ -53,7 +62,8 @@ const moovementGenerator = async () => {
 
         // faire sortir le user de sa salle
         const roomVoid = await updateRoomActualUsers(req);
-        console.log(`${user._id} sort de la salle ${randomRoom.label}`);
+        console.log(`${user._id} sort de la salle ${randomRoom.label} 🚪🚶‍♂️ `);
+        console.log("\n");
         // console.log("roomVoid", roomVoid);
 
         return roomFill;
@@ -66,6 +76,7 @@ const moovementGenerator = async () => {
     return err;
   } finally {
     // close connexion
+    await voidAllRooms();
     await mongoClose();
     await new Promise((resolve) => setTimeout(resolve, 3000));
     if (relance < 4) {

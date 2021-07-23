@@ -8,7 +8,6 @@ module.exports = (async () => {
   try {
     await mongo().then(async (mongoose) => {
       await voidAllRooms();
-      console.log("Salles vidées !");
     });
   } catch (error) {
     console.error("error", error);
