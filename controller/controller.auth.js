@@ -56,7 +56,8 @@ exports.LoginUser = (req, res) => {
                 lastName: user.lastName,
                 email: user.email,
                 role: user.role,
-                profile_picture: user.profile_picture
+                profile_picture: user.profile_picture,
+                token: user.token
               }
               //saving token to cookie
               res.cookie("authToken", user.token).status(200).json({
