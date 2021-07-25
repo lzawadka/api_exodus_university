@@ -13,7 +13,7 @@ const roomRouter = require("./routes/route.room.js");
 
 const app = express();
 
-app.use(cors())
+app.use(cors({origin: true, credentials: true}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
