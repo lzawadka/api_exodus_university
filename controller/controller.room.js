@@ -34,7 +34,7 @@ exports.getAllRooms = async (req, res) => {
 };
 
 exports.getRoomDetails = async (req, res) => {
-  const room = await Room.findOne({ _id: req.body.id });
+  const room = await Room.findOne({ _id: req.params.roomId });
   if (res) {
     return res.status(200).json({ success: true, room });
   }
