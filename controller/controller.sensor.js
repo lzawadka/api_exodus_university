@@ -62,6 +62,8 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
     usersWatch = await getWatchIds(getRoomUsers.actual_users);
   } else {
     return res.status(200).send({ success: true, usersWatchResult: [] });
+
+    // return res.status(400).send({ success: false, message: "No user in room, room_node_id: " +  req.body.room_id});
   }
   let indexUser = 0;
 
