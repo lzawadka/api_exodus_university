@@ -61,8 +61,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
   if (getRoomUsers.actual_users.length != 0) {
     usersWatch = await getWatchIds(getRoomUsers.actual_users);
   } else {
-    return res.status(200).send({ success: true, usersWatchResult: [] });
-    // return res.status(400).send({ success: false, message: "No user in room, room_id: " +  req.body.room_id});
+    return res.send({ success: true, usersWatchResult: [] });
   }
   let indexUser = 0;
 
@@ -117,9 +116,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
         };
         usersWatchData.push(userData);
       });
-      return res
-        .status(200)
-        .send({ success: true, usersWatchResult: usersWatchData });
+      return res.send({ success: true, usersWatchResult: usersWatchData });
     },
   });
 };
@@ -128,7 +125,7 @@ exports.GetOneRoomData = (req, res) => {
   let arrayResp = [];
   const queryGetOneRoomData = `from(bucket: "MarsUniversity")
     |> range(start: -3h)
-    |> filter(fn: (r) => r["nodeID"] == "${req.body.id_room}")
+    |> filter(fn: (r) => r["nodeID"] == "${req.body.room_node_id}")
     |> filter(fn: (r) => r["_field"] == "data_value")
     |> filter(fn: (r) => r["_measurement"] == "Luminosity" or r["_measurement"] == "Temperature" or r["_measurement"] == "Oxygen" or r["_measurement"] == "Watts")
     |> sort(columns: ["_time"], desc: true)`;
@@ -143,7 +140,7 @@ exports.GetOneRoomData = (req, res) => {
     },
     complete() {
       console.log("Finished SUCCESS");
-      return res.status(200).send({ success: true, bpmValue: arrayResp });
+      return res.status(200).send({ success: true, roomData: arrayResp });
     },
   });
 };

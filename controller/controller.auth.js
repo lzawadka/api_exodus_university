@@ -57,13 +57,20 @@ exports.LoginUser = (req, res) => {
                 email: user.email,
                 role: user.role,
                 profile_picture: user.profile_picture,
+                token: user.token,
               };
               //saving token to cookie
-              res.cookie("authToken", user.token).status(200).json({
-                success: true,
-                message: "Successfully Logged In!",
-                userData: data,
-              });
+              res
+                .cookie("authToken", user.token, {
+                  sameSite: "none",
+                  secure: true,
+                })
+                .status(200)
+                .json({
+                  success: true,
+                  message: "Successfully Logged In!",
+                  userData: data,
+                });
             }
           });
         }
