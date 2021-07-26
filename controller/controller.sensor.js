@@ -61,7 +61,7 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
   if (getRoomUsers.actual_users.length != 0) {
     usersWatch = await getWatchIds(getRoomUsers.actual_users);
   } else {
-    return res.send({ success: true, usersWatchResult: [] });
+    return res.status(200).send({ success: true, usersWatchResult: [] });
   }
   let indexUser = 0;
 
@@ -116,7 +116,9 @@ exports.GetAllUserRoomWatchData = async (req, res) => {
         };
         usersWatchData.push(userData);
       });
-      return res.send({ success: true, usersWatchResult: usersWatchData });
+      return res
+        .status(200)
+        .send({ success: true, usersWatchResult: usersWatchData });
     },
   });
 };
