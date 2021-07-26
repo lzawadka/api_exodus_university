@@ -57,10 +57,9 @@ exports.LoginUser = (req, res) => {
                 email: user.email,
                 role: user.role,
                 profile_picture: user.profile_picture,
-                token: user.token
-              }
+              };
               //saving token to cookie
-              res.cookie("authToken", user.token, { sameSite: 'none', secure: true}).status(200).json({
+              res.cookie("authToken", user.token).status(200).json({
                 success: true,
                 message: "Successfully Logged In!",
                 userData: data,
@@ -89,7 +88,7 @@ exports.LogoutUser = (req, res) => {
   );
 };
 //get authenticated user details
-exports.GetUserDetails= (req, res) => {
+exports.GetUserDetails = (req, res) => {
   return res.status(200).json({
     isAuthenticated: true,
     firstName: req.user.firstName,
@@ -97,56 +96,55 @@ exports.GetUserDetails= (req, res) => {
     email: req.user.email,
     role: req.user.role,
     id_sensor: req.user.id_sensor,
-    profile_picture: req.user.profile_picture
+    profile_picture: req.user.profile_picture,
   });
 };
 //get authenticated user details
 exports.UpdateUser = (req, res) => {
-  let token = req.cookies['authToken'];
+  let token = req.cookies["authToken"];
   User.findByToken(token, (err, user) => {
     if (user.role == "ADMIN") {
-      User.findOne({ 'email': req.body.email }, (err, user) => {
+      User.findOne({ email: req.body.email }, (err, user) => {
         if (!user) {
           return res.status(404).json({
             success: false,
-            message: 'User email not found!'
+            message: "User email not found!",
           });
         }
-        if (req.body.password != null && req.body.password != '')
-          user.password = req.body.password
-        if (req.body.profile_picture != null && req.body.profile_picture != '')
-          user.profile_picture = req.body.profile_picture
-        if (req.body.id_sensor != null && req.body.id_sensor != '')
-          user.id_sensor = req.body.id_sensor
-        if (req.body.role != null && req.body.role != '')
-          user.role = req.body.role
+        if (req.body.password != null && req.body.password != "")
+          user.password = req.body.password;
+        if (req.body.profile_picture != null && req.body.profile_picture != "")
+          user.profile_picture = req.body.profile_picture;
+        if (req.body.id_sensor != null && req.body.id_sensor != "")
+          user.id_sensor = req.body.id_sensor;
+        if (req.body.role != null && req.body.role != "")
+          user.role = req.body.role;
 
         user.save((err, doc) => {
           if (err) {
             return res.status(418).json({
-              errors: err
-            })
+              errors: err,
+            });
           } else {
             console.log(doc, "doc");
             return res.status(200).json({
               success: true,
-              message: 'Successfully Update'
-            })
+              message: "Successfully Update",
+            });
           }
         });
-      })
+      });
     } else {
       return res.status(403).json({
-        message: `You are not allowed to update users. You are ${user.role}`
-      })
+        message: `You are not allowed to update users. You are ${user.role}`,
+      });
     }
-    
-  })
+  });
 };
 //get all users
 exports.GetAllUsers = (req, res) => {
   let usersArray = [];
-  User.find({}, (err, users) => {
+  return User.find({}, (err, users) => {
     users.forEach((user) => {
       const data = {
         firstName: user.firstName,
@@ -154,12 +152,13 @@ exports.GetAllUsers = (req, res) => {
         email: user.email,
         role: user.role,
         profile_picture: user.profile_picture,
-        id_sensor: user.id_sensor
-      }
-      usersArray.push(data)
-    })
-    
-    res.status(200).json({success: true, users: usersArray});  
+        id_sensor: user.id_sensor,
+      };
+      usersArray.push(data);
+    });
+    if (res) {
+      res.status(200).json({ success: true, users: usersArray });
+    }
+    return users;
   }).limit(20);
 };
-
