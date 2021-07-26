@@ -47,7 +47,7 @@ exports.getRoomUsers = async (req, res) => {
 };
 
 exports.updateRoomLocked = async (req, res) => {
-  const filter = { _id: req.body.id };
+  const filter = { _id: req.params.roomId };
   const room = await Room.findOne(filter);
 
   const update = { locked: !room.locked };
