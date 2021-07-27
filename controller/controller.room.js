@@ -56,7 +56,7 @@ exports.updateRoomLocked = async (req, res) => {
 
   roomUpdate = await Room.findOne(filter);
 
-  return res.status(200).json({ success: true, room });
+  return res.status(200).json({ success: true, room: roomUpdate });
 };
 
 exports.updateRoomCapacity = async (req, res) => {
